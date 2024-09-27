@@ -1,0 +1,67 @@
+ Mass Cancel / Move All Subscribe & Save items in Bulk
+
+Like many of you, I take advantage of the Amazon S&S discounts for various products to save money... But I don't typically want the item at full price the next subscription interval.
+
+I've seen posts in the past on reddit from redditors wondering if there is a way to mass cancel subscribe and save items. I have a personal investment in this request because I have so many items I shuffle every month, and canceling them 1 by 1 is going to take me forever.
+
+I present to you two items I've written:
+JavaScript Bookmarklet to cancel every single subscribe and save item
+
+How to use:
+
+    Visit this URL: https://www.amazon.com/auto-deliveries/subscriptionList?listFilter=active
+
+    Press the "Show more subscriptions" button until you can see every item you're subscribed to
+
+    Click on the bookmarklet that you created (steps below)
+
+    Every subscription will open in a new tab and automatically cancel (This step may take some time depending on how many items you have. I had to step away and make coffee)
+
+How to create the bookmarklet (CHROME)
+
+    Right click on your bookmark bar and press "add page..."
+
+    Name the bookmark whatever you'd like (I called it S&S Cancel All')
+
+    Paste the following code into the URL (then press save) Sometimes code here is auto formatted by reddit, here is the raw code: https://pastebin.com/rHp6Ca1X
+
+    javascript:(function(){let baseUrl="https://www.amazon.com/auto-deliveries/ajax/cancelSubscriptionAction?actionType=cancelSubscription&canceledNextDeliveryDate=1730880000000&subscriptionId=";let spans=document.querySelectorAll(%27span[data-action="edit-link-subscription-tablet"]%27);let subscriptionIds=[...spans].map(span=>{let data=span.getAttribute(%27data-edit-link-subscription-tablet%27);let match=data.match(/subscriptionId=([&"]+)/);return match?match[1]:null;}).filter(id=>id);console.log(Found ${subscriptionIds.length} subscription IDs.);function openNextUrl(index){if(index>=subscriptionIds.length){console.log(%27All URLs have been opened.%27);return;}let id=subscriptionIds[index];let url=baseUrl+id;console.log(Opening URL: ${url});let newWindow=window.open(url,%27_blank%27);setTimeout(()=>{openNextUrl(index+1);},1000);}openNextUrl(0);})();
+
+What does this script do?
+
+    Extracts the SubscriptionId from each item on this page
+
+    Generates the cancellation request URL
+
+    Loads the new URL into a new tab, canceling that product
+
+*Please note that this option will generate 1 email in your inbox per product (amazon does this when you cancel), so you may get flooded with a lot of emails*
+Javascript Bookmarklet to move every single subscribe and save item to 6 months in the future
+
+    Visit this URL: https://www.amazon.com/auto-deliveries/subscriptionList?listFilter=active&ref\_=rodx\_mys\_subscriptionFilter\_d\_ret\_active
+
+    Press Bulk Edit Schedule At the top
+
+    Click on the bookmarklet that you created (steps below)
+
+    Seconds later all of your items are now moved 6 months into the future
+
+How to create the bookmarklet (CHROME)
+
+    Right click on your bookmark bar and press "add page..."
+
+    Name the bookmark whatever you'd like (I called it S&S Mover')
+
+    Paste the following code into the URL (then press save) Sometimes code here is auto formatted by reddit, here is the raw code: https://pastebin.com/VG22fTUD
+
+    javascript:(function(){let clickMoreSubscriptions=()=>{let e=document.querySelector('.a-section.subscription-pagination-trigger-container span[data-action="bulk-edit-pagination-action"] > .subscription-pagination-trigger');if(!e||e.parentElement.classList.contains('aok-hidden')){console.log('No more subscriptions to show or button is hidden.'),selects=[...document.querySelectorAll('select[name="changeNextDeliveryDate"]')],console.log(Found ${selects.length} select elements.),processNextSelect();return}e.click(),console.log('Clicked "Show more subscriptions" button.'),clickMoreSubscriptions.counter===undefined?clickMoreSubscriptions.counter=1:clickMoreSubscriptions.counter++,clickMoreSubscriptions.counter<=50?setTimeout(clickMoreSubscriptions,1e3):console.log(%27Stopped after 50 clicks.%27)};let selects=undefined;let processNextSelect=()=>{if(0===selects.length)return console.log(%27All select boxes processed!%27);let e=selects.shift(),t=e.options,n=t[t.length-1],s=e.value;if(s===n.value)return console.log(%27already set, skipping subscription%27),void setTimeout(processNextSelect,100);console.log(%27Changing select element:%27,e),console.log(Current value: ${s}, New value: ${n.value}),e.value=n.value;let o=new Event(%27change%27,{bubbles:!0});e.dispatchEvent(o);let r=e.closest(%27form%27).querySelector(%27.a-button-input%27);r&&r.click(),setTimeout(processNextSelect,100)};clickMoreSubscriptions()})();
+
+What does this script do?
+
+    Auto expands the page so all your items show up ("Show more subscriptions" )
+
+    Finds all the items on the page that have a drop down date, and selects the last option (6 months away)
+
+    Auto-Clicks the "Apply" button for you
+
+I tested this on my amazon account using chrome, if it doesn't work for you let me know and I can try my best to assist. Enjoy :)
